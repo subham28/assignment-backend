@@ -23,7 +23,7 @@ const User = require("../models/user-model");
 
 passport.serializeUser(function(user, done) {
   console.log(user.id);
-  done(null, user.id);
+  done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
@@ -70,7 +70,7 @@ passport.use(
         twitterId: profile._json.id_str,
         profileImageUrl: profile._json.profile_image_url
       });
-      done(null,newUser)
+      done(null, newUser);
       //done(null, currentUser);
     }
   )

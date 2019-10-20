@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const passport = require("passport");
-//const passport = require("../config/passport-setup");
 const CLIENT_HOME_PAGE_URL = "http://localhost:3000/other";
 var Twitter = require("twitter");
 const keys = require("../config/keys");
@@ -39,8 +38,6 @@ router.get("/logout", (req, res) => {
   res.redirect(CLIENT_HOME_PAGE_URL);
 });
 
-console.log(passport);
-
 // auth with twitter
 router.get("/twitter", passport.authenticate("twitter"));
 
@@ -53,36 +50,27 @@ router.get(
   })
 );
 
-router.post("/validate",(req, res) =>{
-  console.log("request ",req.body);
- // console.log("response ",res)
-})
+router.post("/validate", (req, res) => {
+  console.log("request ", req.body);
+  // console.log("response ",res)
+});
 
-var resArr = []
-router.post("/search/tweet",(req, res) =>{
-  console.log("request ",req.body.text);
-  client.get("search/tweets",{q:req.body.text},function(
-    error,
-    tweets,
-    response
-  ){
-    tweets.statuses.forEach(function(tweet) {
-        console.log("tweet: " + tweet.text);
-        resArr.push(tweet.text);
-    });
-  })
+router.post("/search/tweet", async (req, res) => {
+  console.log("request ", req.body.text);
+  var resFromApi = await getTweets(req.body.text);
+  var statusTextArr = [];
+  resFromApi.statuses.forEach(function(tweet) {
+    statusTextArr.push(tweet.text);
+  });
+
   res.status(200).json({
-    responseFromApi:resArr
-  })
-})
+    responseObj: statusTextArr
+  });
+});
 
-// client.get("search/tweets", { q: "#fun #stream" }, function(
-//   error,
-//   tweets,
-//   response
-// ) {
-//   tweets.statuses.forEach(function(tweet) {
-//     console.log("tweet: " + tweet.text);
-//   });
-// });
+function getTweets(param) {
+  return client.get("search/tweets", { q: param }).then(data => {
+    return data;
+  });
+}
 module.exports = router;
